@@ -1,47 +1,14 @@
 package sample;
 
-public class Question implements Comparable<Question> {
-
-    /**
-     * Используется для определения уникальности. С его помощью можно расположить вопросы в нужном порядке
-     */
-    private Integer id;
-    /**
-     * Сам вопрос
-     */
+public class Question {
     private String question;
-    /**
-     * Ответ, который поведет по левой ветке
-     */
-    private String leftAnswer;
-    /**
-     * Ответ, который поведет по правой ветке
-     */
-    private String rightAnswer;
-    /**
-     * Результат ответа на вопрос. Используется только в случае, если вопрос последний и после него ничего не идет
-     */
     private String result;
+    private String help;
 
-    public Question(Integer id, String question, String leftAnswer, String rightAnswer) {
+    Question(String question, String result, String help) {
         this.question = question;
-        this.leftAnswer = leftAnswer;
-        this.rightAnswer = rightAnswer;
-        this.id = id;
-    }
-
-    public Question(Integer id, String result) {
-        this.id = id;
         this.result = result;
-    }
-
-    @Override
-    public int compareTo(Question question) {
-        return this.id - question.getId();
-    }
-
-    public Integer getId() {
-        return id;
+        this.help = help;
     }
 
     public String getResult() {
@@ -52,12 +19,7 @@ public class Question implements Comparable<Question> {
         return question;
     }
 
-    public String getLeftAnswer() {
-        return leftAnswer;
+    public String getHelp() {
+        return help;
     }
-
-    public String getRightAnswer() {
-        return rightAnswer;
-    }
-
 }

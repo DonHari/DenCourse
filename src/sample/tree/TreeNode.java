@@ -2,16 +2,15 @@ package sample.tree;
 
 import sample.Question;
 
-public class TreeNode {
-    Question value;
-    TreeNode left;
-    TreeNode right;
-    TreeNode parent;
+import java.util.Map;
 
-    TreeNode(Question value, TreeNode parent) {
+public class TreeNode {
+    private Question value;
+    private Map<String, TreeNode> children;
+    private TreeNode parent;
+
+    public TreeNode(Question value, TreeNode parent) {
         this.value = value;
-        this.left = null;
-        this.right = null;
         this.parent = parent;
     }
 
@@ -21,5 +20,13 @@ public class TreeNode {
 
     public TreeNode getParent() {
         return parent;
+    }
+
+    public Map<String, TreeNode> getChildren(){
+        return children;
+    }
+
+    public void setChildren(Map<String, TreeNode> children) {
+        this.children = children;
     }
 }

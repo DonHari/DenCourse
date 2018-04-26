@@ -6,38 +6,51 @@ import javafx.stage.Stage;
 import sample.tree.BinaryTree;
 import sample.tree.TreeNode;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class Controller {
     @FXML
-    private RadioButton leftAnswer;
+    private RadioButton firstAnswer;
     @FXML
-    private RadioButton rightAnswer;
+    private RadioButton secondAnswer;
+    @FXML
+    private RadioButton thirdAnswer;
     @FXML
     private Label questionLabel;
     @FXML
     private Button previousButton;
+    @FXML
+    private ToggleGroup answerToggleGroup;
 
     private BinaryTree tree;
     private Integer questionNumber = 1;
 
-    //вызывается при создании окна. Окно уже существует, но его пока что не видно (но это не точно)
     @FXML
     public void initialize() {
         createQuestions();
         showQuestion(tree.getCurrent());
     }
 
-    /**
-     * Метод для создания дерева
-     */
     private void createQuestions() {
+        TreeNode head = new TreeNode(
+                new Question("как дела?", null, "бог тебе в помощь"),
+                null
+        );
+        Map<String, TreeNode> children = new HashMap<>();
+        children.put("Хорошо", new TreeNode(new Question(null, "Не может быть такого", "Небо поможет нам, но не тебе))))00)"), head));
+        children.put("Нормельно", new TreeNode(new Question(null, "Ну ок", "Хватит меня нажимать"), head));
+        children.put("Плохо", new TreeNode(new Question("Че так?", null, "Тебе скучно?"), head));
+        head.setChildren(children);
+
+        children = new HashMap<>();
+        children.put("Хз", new TreeNode(new Question(null, "Ты сначала определись, а потом проходи тест", "Все равно не помогу"), children.get("Плохо")));
+        children.put("Потому что", new TreeNode(new Question(null, "Ну и иди ты", "Ну тебя нах"), children.get("Плохо")));
+        head.getChildren().get("Плохо").setChildren(children);
+
         tree = new BinaryTree();
-        tree.add(new Question(4, "Как дела?", "Плохо", "Хорошо"));//head
-        tree.add(new Question(2, "Че так?", "Хз", "В лолец хочу"));//head.left
-        tree.add(new Question(1, "Ну и иди нах со своей неопределенностью"));//head.left.left
-        tree.add(new Question(3, "Иди катай"));//head.left.right
-        tree.add(new Question(5, "Пиздишь. В этой стране не бывает хорошего настроения"));//head.right
+        tree.setTree(head);
     }
 
     public void previousButtonClicked() {
@@ -47,36 +60,34 @@ public class Controller {
 
     public void answerButtonClicked() {
         TreeNode nextQuestion;
-        if(leftAnswer.isSelected()) {
-            nextQuestion = tree.next(BinaryTree.Direction.LEFT);
-        } else if(rightAnswer.isSelected()) {
-            nextQuestion = tree.next(BinaryTree.Direction.RIGHT);
+        if (answerToggleGroup.getSelectedToggle() != null) {
+            RadioButton selected = (RadioButton) answerToggleGroup.getSelectedToggle();
+            nextQuestion = tree.next(selected.getText());
+
+            showQuestion(nextQuestion);
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Ошибка");
             alert.setHeaderText("Не выбран ответ");
-            alert.setContentText("Необходимо выбрать ответ, чтобы двигаться дальше!");
+            alert.setContentText("Для прохождения теста выберите один из предложенных вариантов ответа");
             alert.showAndWait();
-            return;
         }
-        showQuestion(nextQuestion);
     }
 
     private void showQuestion(TreeNode questionNode) {
-        if(questionNode.getParent() == null) {
+        if (questionNode.getParent() == null) {
             previousButton.setDisable(true);
         } else {
             previousButton.setDisable(false);
         }
 
-        //show result
-        if(questionNode.getValue().getQuestion() == null) {
+        if (questionNode.getValue().getQuestion() == null) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Тест пройден!");
             alert.setHeaderText(questionNode.getValue().getResult());
             alert.setContentText("Вы хотите пройти тест заново? Если нет, то программа будет закрыта.");
             Optional<ButtonType> buttonTypeOptional = alert.showAndWait();
-            if(buttonTypeOptional.get() == ButtonType.OK) {
+            if (buttonTypeOptional.get() == ButtonType.OK) {
                 tree.startFromHead();
                 questionNumber = 1;
                 showQuestion(tree.getCurrent());
@@ -84,13 +95,22 @@ public class Controller {
                 Stage stage = (Stage) questionLabel.getScene().getWindow();
                 stage.close();
             }
-        } else {//show next question
+        } else {
             questionLabel.setText("Вопрос " + questionNumber + ". " + questionNode.getValue().getQuestion());
             questionNumber++;
-            leftAnswer.setText(questionNode.getValue().getLeftAnswer());
-            rightAnswer.setText(questionNode.getValue().getRightAnswer());
-            leftAnswer.setSelected(false);
-            rightAnswer.setSelected(false);
+            Map<String, TreeNode> children = questionNode.getChildren();
+            String[] answers = children.keySet().toArray(new String[0]);
+            firstAnswer.setText(answers[0]);
+            secondAnswer.setText(answers[1]);
+            if (answers.length == 2) {
+                thirdAnswer.setDisable(true);
+                thirdAnswer.setVisible(false);
+            } else {
+                thirdAnswer.setDisable(false);
+                thirdAnswer.setText(answers[2]);
+                thirdAnswer.setVisible(true);
+            }
+            answerToggleGroup.selectToggle(null);
         }
     }
 
@@ -98,5 +118,13 @@ public class Controller {
         questionNumber = 1;
         tree.startFromHead();
         showQuestion(tree.getCurrent());
+    }
+
+    public void showHelp() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Помощь");
+        alert.setHeaderText("Помощь к вопросу: \"" + tree.getCurrent().getValue().getQuestion() + "\"");
+        alert.setContentText(tree.getCurrent().getValue().getHelp());
+        alert.showAndWait();
     }
 }
