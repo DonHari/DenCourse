@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    private static final String TITLE = "Венедиктов курсач";
+    private static final String TITLE = "Курсач";
     private static final Double WIDTH = 600.;
     private static final Double HEIGHT = 200.;
 

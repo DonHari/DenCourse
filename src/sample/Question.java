@@ -5,10 +5,13 @@ public class Question {
     private String result;
     private String help;
 
-    Question(String question, String result, String help) {
+    Question(String question, String help) {
         this.question = question;
-        this.result = result;
         this.help = help;
+    }
+
+    Question(String result){
+        this.result = result;
     }
 
     public String getResult() {
